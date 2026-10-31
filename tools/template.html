@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seconwind Help</title>
+<style>
+/*ROOT_VARS*/
+/* Offline: no web fonts, so fall back to the fonts Linux Mint ships with. */
+:root { --font-serif: 'Fraunces', 'DejaVu Serif', Georgia, serif; --font-sans: 'Manrope', 'Ubuntu', 'Noto Sans', sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 28px 20px 60px; }
+h1 { font-family: var(--font-serif); color: var(--moss); margin: 0 0 4px; font-weight: 600; }
+.lead { color: var(--ink-muted); margin: 0 0 22px; }
+.help-card { background: #fbf7ef; border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-top: 22px; }
+.help-card h2 { font-family: var(--font-serif); color: var(--moss); margin: 0 0 6px; font-size: 1.25rem; }
+.help-card a.btn { display: inline-block; background: var(--moss); color: #fff; padding: 9px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; margin: 6px 8px 6px 0; }
+.help-card dl { display: grid; grid-template-columns: 150px 1fr; gap: 4px 12px; margin: 10px 0 0; font-size: 0.95rem; }
+.help-card dt { color: var(--ink-muted); }
+.help-card dd { margin: 0; }
+/*GUIDES_CSS*/
+/* The panel is the whole page here, not a floating pop-up. */
+.guides-btn { display: none !important; }
+.guides-panel { position: static !important; display: block !important; opacity: 1 !important; visibility: visible !important;
+  transform: none !important; pointer-events: auto !important; width: auto !important; max-width: none !important;
+  max-height: none !important; box-shadow: none !important; border-radius: 12px !important; }
+.guides-panel-body { max-height: none !important; overflow: visible !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Seconwind Help</h1>
+  <p class="lead">Answers for your computer that work even without the internet. If it isn't covered here, Michael is one email away.</p>
+
+  <div class="guides-panel open" id="guidesPanel" role="region" aria-label="Quick answers">
+    <div class="guides-panel-header">
+      <div class="g-eyebrow">For Seconwind clients</div>
+      <div class="g-title">Quick answers</div>
+      <div class="g-sub">Real answers from your setup guides, not a chatbot. If it's not sure, it says so and points you to Michael.</div>
+    </div>
+    <div class="guides-panel-body">
+      <div class="g-tasks" id="gTasks"></div>
+      <label class="g-field-label" for="gInput">Or type your question</label>
+      <div class="g-input-row">
+        <input class="g-input" id="gInput" type="text" placeholder="e.g. how do I connect my printer?" autocomplete="off" spellcheck="false">
+        <button class="g-submit" id="gSubmit">Ask →</button>
+      </div>
+      <div class="g-answer" id="gAnswer"></div>
+    </div>
+  </div>
+  <button class="guides-btn open" id="guidesBtn" aria-expanded="true" aria-controls="guidesPanel" hidden></button>
+
+  <section class="help-card" aria-labelledby="getHelp">
+    <h2 id="getHelp">Get help from Michael</h2>
+    <p>Describe what you were trying to do and what happened. Your computer's details below are added to the email for you.</p>
+    <a class="btn" id="mailBtn" href="mailto:{{EMAIL}}">Email {{EMAIL}}</a>
+    <dl id="machine"></dl>
+  </section>
+</main>
+
+<script src="machine-info.js"></script>
+<script>
+(function () {
+  'use strict';
+  var m = window.SECONWIND_MACHINE || {};
+  var rows = [['Computer', m.model], ['System', m.os], ['Computer name', m.hostname], ['Set up by Seconwind', m.installed]];
+  var dl = document.getElementById('machine');
+  rows.forEach(function (r) {
+    if (!r[1]) return;
+    var dt = document.createElement('dt'); dt.textContent = r[0];
+    var dd = document.createElement('dd'); dd.textContent = r[1];
+    dl.appendChild(dt); dl.appendChild(dd);
+  });
+  window.helpMailto = function (question) {
+    var body = 'Hi Michael,\n\n' + (question ? 'I was trying to: ' + question + '\n\n' : '') +
+      'What happened:\n\n\n---\n' + rows.filter(function (r) { return r[1]; }).map(function (r) { return r[0] + ': ' + r[1]; }).join('\n');
+    return 'mailto:{{EMAIL}}?subject=' + encodeURIComponent('Help with my computer') + '&body=' + encodeURIComponent(body);
+  };
+  document.getElementById('mailBtn').href = window.helpMailto();
+})();
+</script>
+<script>
+/*GUIDES_JS*/
+</script>
+</body>
+</html>

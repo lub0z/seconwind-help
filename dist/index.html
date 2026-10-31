@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seconwind Help</title>
+<style>
+:root {
+      --paper:        #f2ebdd;
+      --paper-dark:   #e8dfcc;
+      --ink:          #1a1814;
+      --ink-soft:     #3a352e;
+      --ink-muted:    #6b6558;
+      --moss:         #2d4a3e;
+      --moss-dark:    #1f362c;
+      --moss-light:   #8a9a85;
+      --ochre:        #c17d3a;
+      --ochre-dark:   #a16523;
+      --line:         #c9bfa8;
+
+      --font-serif:   'Fraunces', Georgia, serif;
+      --font-sans:    'Manrope', -apple-system, sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+
+      --maxw:         1200px;
+    }
+/* Offline: no web fonts, so fall back to the fonts Linux Mint ships with. */
+:root { --font-serif: 'Fraunces', 'DejaVu Serif', Georgia, serif; --font-sans: 'Manrope', 'Ubuntu', 'Noto Sans', sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); font-size: 17px; line-height: 1.55; }
+main { max-width: 760px; margin: 0 auto; padding: 28px 20px 60px; }
+h1 { font-family: var(--font-serif); color: var(--moss); margin: 0 0 4px; font-weight: 600; }
+.lead { color: var(--ink-muted); margin: 0 0 22px; }
+.help-card { background: #fbf7ef; border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-top: 22px; }
+.help-card h2 { font-family: var(--font-serif); color: var(--moss); margin: 0 0 6px; font-size: 1.25rem; }
+.help-card a.btn { display: inline-block; background: var(--moss); color: #fff; padding: 9px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; margin: 6px 8px 6px 0; }
+.help-card dl { display: grid; grid-template-columns: 150px 1fr; gap: 4px 12px; margin: 10px 0 0; font-size: 0.95rem; }
+.help-card dt { color: var(--ink-muted); }
+.help-card dd { margin: 0; }
+
+    .guides-btn {
+      position: fixed;
+      bottom: 1.5rem; right: 1.5rem;
+      background: var(--moss);
+      color: var(--paper);
+      padding: 0.9rem 1.2rem;
+      border-radius: 999px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 8px 20px -4px rgba(26,24,20,0.3);
+      cursor: pointer;
+      z-index: 42;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: transform 0.2s, background 0.2s;
+      border: none;
+    }
+    .guides-btn:hover { transform: translateY(-2px); }
+    .guides-btn.open { background: var(--ink-soft); transform: none; }
+    .guides-btn .g-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--ochre);
+      box-shadow: 0 0 8px var(--ochre);
+      animation: pulse 2s infinite;
+      flex-shrink: 0;
+    }
+    .guides-btn.open .g-dot { display: none; }
+    .guides-btn .g-close-label { display: none; }
+    .guides-btn.open .g-close-label { display: inline; }
+    .guides-btn.open .g-open-label { display: none; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .guides-panel {
+      position: fixed;
+      bottom: 5.5rem; right: 1.5rem;
+      width: 380px;
+      max-width: calc(100vw - 3rem);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: 0 24px 48px -8px rgba(26,24,20,0.2), 0 4px 12px -2px rgba(26,24,20,0.1);
+      z-index: 41;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: min(76vh, 580px);
+      transform: translateY(16px) scale(0.97);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+    }
+    .guides-panel.open { transform: none; opacity: 1; pointer-events: all; }
+
+    .guides-panel-header {
+      padding: 1.4rem 1.5rem 1.1rem;
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .g-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ochre-dark);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+    }
+    .g-eyebrow::before { content: ''; width: 18px; height: 1px; background: var(--ochre-dark); }
+    .g-title {
+      font-family: var(--font-serif);
+      font-weight: 500;
+      font-size: 1.22rem;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .g-sub { font-size: 0.8rem; color: var(--ink-muted); margin-top: 0.2rem; line-height: 1.45; }
+
+    .guides-panel-body { padding: 1.1rem 1.4rem 1.3rem; overflow-y: auto; flex: 1; }
+
+    .g-tasks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+      margin-bottom: 1.1rem;
+    }
+    .g-task {
+      background: var(--paper-dark);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 0.5rem 0.7rem;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+      cursor: pointer;
+      text-align: left;
+      line-height: 1.3;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .g-task:hover { border-color: var(--moss); color: var(--moss); background: rgba(45,74,62,0.04); }
+
+    .g-field-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.35rem;
+    }
+    .g-input-row { display: flex; gap: 0.45rem; }
+    .g-input {
+      flex: 1;
+      padding: 0.72rem 0.85rem;
+      font-family: var(--font-sans);
+      font-size: 0.92rem;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      color: var(--ink);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .g-input:focus { outline: none; border-color: var(--moss); background: var(--paper-dark); }
+    .g-submit {
+      padding: 0 1rem;
+      background: var(--moss);
+      color: var(--paper);
+      border: none;
+      border-radius: 2px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .g-submit:hover { background: var(--moss-dark); }
+
+    .g-answer { margin-top: 1.1rem; display: none; }
+    .g-answer.visible { display: block; }
+
+    .g-card {
+      background: var(--paper-dark);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1.2rem 1.35rem;
+    }
+    .g-card h3 {
+      font-family: var(--font-serif);
+      font-weight: 500;
+      font-size: 1.05rem;
+      color: var(--ink);
+      margin-bottom: 0.8rem;
+      letter-spacing: -0.01em;
+    }
+    .g-card p { font-size: 0.87rem; color: var(--ink-soft); line-height: 1.65; margin-bottom: 0.55rem; }
+    .g-card p:last-child { margin-bottom: 0; }
+    .g-card ol, .g-card ul { padding-left: 1.4rem; margin: 0.4rem 0 0.55rem; }
+    .g-card li { font-size: 0.87rem; color: var(--ink-soft); line-height: 1.65; margin-bottom: 0.15rem; }
+
+    .g-escalation {
+      background: var(--paper-dark);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1.2rem 1.35rem;
+    }
+    .g-esc-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--ochre-dark);
+      margin-bottom: 0.45rem;
+    }
+    .g-escalation h3 {
+      font-family: var(--font-serif);
+      font-weight: 500;
+      font-size: 1rem;
+      color: var(--ink);
+      margin-bottom: 0.45rem;
+    }
+    .g-escalation p { font-size: 0.85rem; color: var(--ink-soft); line-height: 1.55; margin-bottom: 0.85rem; }
+    .g-help-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1rem;
+      background: var(--moss);
+      color: var(--paper);
+      border-radius: 2px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .g-help-link:hover { background: var(--moss-dark); }
+
+    @media (max-width: 480px) {
+      .guides-panel { bottom: 5rem; right: 1rem; left: 1rem; width: auto; max-width: none; }
+      .guides-btn { bottom: 1rem; right: 1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    
+/* The panel is the whole page here, not a floating pop-up. */
+.guides-btn { display: none !important; }
+.guides-panel { position: static !important; display: block !important; opacity: 1 !important; visibility: visible !important;
+  transform: none !important; pointer-events: auto !important; width: auto !important; max-width: none !important;
+  max-height: none !important; box-shadow: none !important; border-radius: 12px !important; }
+.guides-panel-body { max-height: none !important; overflow: visible !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Seconwind Help</h1>
+  <p class="lead">Answers for your computer that work even without the internet. If it isn't covered here, Michael is one email away.</p>
+
+  <div class="guides-panel open" id="guidesPanel" role="region" aria-label="Quick answers">
+    <div class="guides-panel-header">
+      <div class="g-eyebrow">For Seconwind clients</div>
+      <div class="g-title">Quick answers</div>
+      <div class="g-sub">Real answers from your setup guides, not a chatbot. If it's not sure, it says so and points you to Michael.</div>
+    </div>
+    <div class="guides-panel-body">
+      <div class="g-tasks" id="gTasks"></div>
+      <label class="g-field-label" for="gInput">Or type your question</label>
+      <div class="g-input-row">
+        <input class="g-input" id="gInput" type="text" placeholder="e.g. how do I connect my printer?" autocomplete="off" spellcheck="false">
+        <button class="g-submit" id="gSubmit">Ask →</button>
+      </div>
+      <div class="g-answer" id="gAnswer"></div>
+    </div>
+  </div>
+  <button class="guides-btn open" id="guidesBtn" aria-expanded="true" aria-controls="guidesPanel" hidden></button>
+
+  <section class="help-card" aria-labelledby="getHelp">
+    <h2 id="getHelp">Get help from Michael</h2>
+    <p>Describe what you were trying to do and what happened. Your computer's details below are added to the email for you.</p>
+    <a class="btn" id="mailBtn" href="mailto:hello@seconwind.com">Email hello@seconwind.com</a>
+    <dl id="machine"></dl>
+  </section>
+</main>
+
+<script src="machine-info.js"></script>
+<script>
+(function () {
+  'use strict';
+  var m = window.SECONWIND_MACHINE || {};
+  var rows = [['Computer', m.model], ['System', m.os], ['Computer name', m.hostname], ['Set up by Seconwind', m.installed]];
+  var dl = document.getElementById('machine');
+  rows.forEach(function (r) {
+    if (!r[1]) return;
+    var dt = document.createElement('dt'); dt.textContent = r[0];
+    var dd = document.createElement('dd'); dd.textContent = r[1];
+    dl.appendChild(dt); dl.appendChild(dd);
+  });
+  window.helpMailto = function (question) {
+    var body = 'Hi Michael,\n\n' + (question ? 'I was trying to: ' + question + '\n\n' : '') +
+      'What happened:\n\n\n---\n' + rows.filter(function (r) { return r[1]; }).map(function (r) { return r[0] + ': ' + r[1]; }).join('\n');
+    return 'mailto:hello@seconwind.com?subject=' + encodeURIComponent('Help with my computer') + '&body=' + encodeURIComponent(body);
+  };
+  document.getElementById('mailBtn').href = window.helpMailto();
+})();
+</script>
+<script>
+/* ============================================================
+   GUIDES MODULE — Seconwind self-serve Q&A
+   Three layers:
+     1. KB        — 12 embedded markdown docs + keyword maps
+     2. Retrieval — keyword-weighted TF-IDF, strict confidence floor
+                    (port of retriever.py; same scoring, same guards)
+     3. Answer    — getAnswer() is the single seam for a future LLM backend
+   ============================================================ */
+(function () {
+'use strict';
+
+// ── 1. KNOWLEDGE BASE ─────────────────────────────────────────────────────
+// Bodies are verbatim markdown from mint22_kb/ (keyword comment stripped,
+// first # heading kept so the renderer can skip it).
+const KB_RAW = [
+  {
+    id: '01',
+    kw: 'install software program app application download add vlc gimp',
+    title: 'Installing software (Software Manager)',
+    body: `# Installing software (Software Manager)
+
+Your computer comes with a Software Manager — think of it like an app store, but everything in it is free and safe.
+
+To install a program:
+1. Click the Menu button in the bottom-left corner.
+2. Type "Software Manager" and click it.
+3. Use the search box at the top to find what you want (for example "VLC" or "GIMP").
+4. Click the program, then click Install.
+5. Enter your password if asked. That's the password you use to log in.
+
+When it finishes, the program appears in the Menu. You don't need to download anything from websites — the Software Manager handles it all safely.
+
+If you can't find a program, it may not be available this way. Tap Get Help and Michael can sort it for you.`
+  },
+  {
+    id: '02',
+    kw: 'update updates upgrade security patch shield latest',
+    title: 'Keeping your computer updated (Update Manager)',
+    body: `# Keeping your computer updated (Update Manager)
+
+Updates keep your computer secure and running well. Your machine checks for them automatically and shows a shield icon near the clock when updates are ready.
+
+To update:
+1. Click the shield icon in the bottom-right corner (near the clock). If you don't see it, open the Menu and search "Update Manager".
+2. Click Refresh to check for the latest updates.
+3. Click Install Updates.
+4. Enter your login password if asked.
+
+It's safe to keep using the computer while updates install. You rarely need to restart, but if an update asks you to, it's fine to do it later.
+
+There is nothing to pay and nothing to sign up for. Updates are free and part of how Linux Mint stays safe.`
+  },
+  {
+    id: '03',
+    kw: 'printer print printing scan brother hp epson canon',
+    title: 'Connecting a printer',
+    body: `# Connecting a printer
+
+Most printers work as soon as you plug them in or connect them to your Wi-Fi.
+
+For a USB printer:
+1. Turn the printer on and plug the USB cable into your computer.
+2. Wait about 30 seconds. Mint usually sets it up on its own.
+3. Open any document, choose Print, and check your printer is listed.
+
+For a Wi-Fi printer:
+1. Make sure the printer is connected to the same Wi-Fi as your computer.
+2. Open the Menu, search "Printers", and open it.
+3. Click Add and pick your printer from the list.
+
+If your printer isn't found, the Helper's printer check (on the diagnostics screen) can look into it. Some printers — Brother especially — need a driver from the maker's website; tap Get Help and Michael can install it for you.`
+  },
+  {
+    id: '04',
+    kw: 'timeshift restore snapshot backup undo revert broke broken recover rollback',
+    title: 'Going back in time if something breaks (Timeshift)',
+    body: `# Going back in time if something breaks (Timeshift)
+
+Your computer automatically takes "snapshots" — saved copies of how everything was working on a given day. If something stops working, you can roll back to an earlier snapshot, like an undo button for the whole system.
+
+This was set up for you when your computer was installed.
+
+To restore:
+1. Open the Menu and search "Timeshift".
+2. Enter your login password.
+3. Pick a snapshot from a date when things were working.
+4. Click Restore and follow the prompts.
+
+Your personal files — documents, photos, emails — are not changed by this. Timeshift only rolls back the system itself.
+
+If you're unsure which snapshot to pick, tap Get Help before restoring.`
+  },
+  {
+    id: '05',
+    kw: 'help remote support rustdesk michael stuck assist',
+    title: 'Getting remote help from Michael (RustDesk)',
+    body: `# Getting remote help from Michael
+
+If you're stuck, Michael can help — over the phone, or by connecting to your screen so he can see what you're seeing and sort it out directly.
+
+To get help:
+1. Send a message through the contact form on this website, or phone Michael directly.
+2. Tell him what's happening. If it needs a screen-share, he'll talk you through opening the remote-support tool that was set up on your computer.
+3. It shows a one-time code that you read out to him. He connects only when you give him that code.
+4. You both see the same screen, and you can watch everything he does.
+
+The connection only lasts for that session, and Michael can't get back in without a fresh code from you. Nothing happens without your say-so — you're always in control.`
+  },
+  {
+    id: '06',
+    kw: 'files file folder document documents photos pictures images downloads music videos find search where nemo',
+    title: 'Finding your files (Files / Nemo)',
+    body: `# Finding your files (Files / Nemo)
+
+Your documents, photos, downloads and music live in your Home folder.
+
+To open it:
+1. Click the Files icon in the panel at the bottom (it looks like a filing cabinet), or open the Menu and search "Files".
+2. You'll see folders: Documents, Downloads, Pictures, Music, Videos.
+3. Double-click a folder to open it.
+
+To search for something by name, click the magnifying glass at the top of the Files window and start typing.
+
+Anything you download from the internet usually lands in the Downloads folder.`
+  },
+  {
+    id: '07',
+    kw: 'wifi wireless internet network connection online router broadband signal',
+    title: 'Connecting to Wi-Fi',
+    body: `# Connecting to Wi-Fi
+
+1. Look at the bottom-right of the screen, near the clock, for the network icon.
+2. Click it. A list of nearby Wi-Fi networks appears.
+3. Click your network's name.
+4. Type your Wi-Fi password (the one on your router or that your provider gave you) and click Connect.
+
+Your computer remembers the network and reconnects on its own next time.
+
+If your network doesn't appear, or it connects but pages won't load, the Helper's internet check (on the diagnostics screen) can pinpoint the problem.`
+  },
+  {
+    id: '08',
+    kw: 'password passcode login forgot reset change credentials locked',
+    title: 'Changing your password',
+    body: `# Changing your password
+
+1. Open the Menu and search "Users and Groups", then open it.
+2. Enter your current password if asked.
+3. Click the row with your name.
+4. Click the Password field and set a new one.
+
+Pick something you'll remember but others wouldn't guess. This is the password you use to log in and to confirm changes like installing software or updates — so keep it somewhere safe.
+
+If you've forgotten your password entirely and can't log in, tap Get Help — Michael can reset it for you.`
+  },
+  {
+    id: '09',
+    kw: 'browser firefox web website bookmark google browse',
+    title: 'Browsing the internet (Firefox)',
+    body: `# Browsing the internet (Firefox)
+
+Your computer comes with Firefox, a fast and private web browser.
+
+To open it, click the Firefox icon in the bottom panel, or open the Menu and search "Firefox".
+
+- Type a website address or a search into the bar at the top.
+- Click the star to bookmark a page you want to find again.
+- Your bookmarks live behind the small library icon near the top-right.
+
+Firefox updates itself safely through the same Update Manager that looks after the rest of your computer, so you're always on a secure version.`
+  },
+  {
+    id: '10',
+    kw: 'settings display screen resolution wallpaper background theme dark light sound volume power sleep brightness',
+    title: 'Changing settings (System Settings)',
+    body: `# Changing settings (System Settings)
+
+You can adjust how your computer looks and behaves from one place.
+
+Open the Menu and search "System Settings". Common things people change:
+
+- Display: screen resolution and, if you have two screens, how they're arranged.
+- Backgrounds: your desktop wallpaper.
+- Themes: light or dark appearance.
+- Sound: speaker and microphone volume.
+- Power Management: when the screen turns off or the computer sleeps.
+
+Nothing here can harm your computer — feel free to explore. If a change causes a problem, you can undo it, or roll back with Timeshift.`
+  },
+  {
+    id: '11',
+    kw: 'usbstick usbdrive stick drive flash memory external pendrive thumb eject removable',
+    title: 'Using USB sticks and external drives',
+    body: `# Using USB sticks and external drives
+
+1. Plug the USB stick or drive into a USB port.
+2. After a moment, a window opens, or an icon appears in the Files sidebar on the left.
+3. Click it to see what's on the drive.
+4. Copy files by dragging them between folders, the same as anywhere else.
+
+Before unplugging, click the small eject symbol next to the drive's name in Files, or right-click it and choose Eject. This makes sure your files finished saving and won't be damaged.`
+  },
+  {
+    id: '12',
+    kw: 'mint linux about computer virus antivirus operating system',
+    title: 'About your computer (Linux Mint)',
+    body: `# About your computer (Linux Mint)
+
+Your computer runs Linux Mint — a free, fast and secure operating system, set up for you by Seconwind.
+
+A few things worth knowing:
+
+- It doesn't get the viruses that Windows computers are known for, so you don't need to buy antivirus software.
+- The programs you need are installed free through the Software Manager — no subscriptions or licence fees.
+- It's designed to keep running well on the same computer for years, including older machines.
+- Updates are free and keep it secure.
+
+If anything ever feels confusing or stops working, this Helper can check common problems for you, and Michael is one tap away through Get Help.`
+  }
+];
+
+// ── 2. RETRIEVAL (port of retriever.py KnowledgeBase) ────────────────────
+// Identical stop-word set, normalisations, scoring weights, and confidence
+// floor. Do not relax the floor — for non-technical users a wrong answer is
+// worse than "I don't know".
+
+const STOP = new Set([
+  'the','a','an','to','of','and','or','is','are','in','on','for',
+  'it','this','that','you','your','with','how','do','i','my','can',
+  'what','when','where','if','be','at','as','from','into','by',
+  'make','made','making','want','need','get','got','cup','please',
+  'would','could','should','me','some','any','out','up','down',
+  'not','no','working','work','use','using','go','going','back',
+  // auxiliary verbs with no search intent (not in the Python set but needed here
+  // because "have/has/had" appear in KB prose and otherwise match unrelated queries)
+  'have','has','had'
+]);
+
+function tokenize(text) {
+  let s = text.toLowerCase();
+  s = s.replace(/wi[\s\-]?fi/g, 'wifi');
+  s = s.replace(/usb\s+stick/g, 'usbstick');
+  s = s.replace(/usb\s+drive/g, 'usbdrive');
+  return (s.match(/[a-z0-9]+/g) || []).filter(w => !STOP.has(w) && w.length > 1);
+}
+
+// Build KB: compute term-freq, keyword set, title tokens at init
+const KB = KB_RAW.map(doc => {
+  const toks = tokenize(doc.body);
+  const tf = {};
+  for (const t of toks) tf[t] = (tf[t] || 0) + 1;
+  const kw = new Set(tokenize(doc.kw));
+  const titleToks = new Set(tokenize(doc.title));
+  return { ...doc, toks, tf, kw, titleToks };
+});
+
+// IDF: log((N+1)/(df+0.5)) + 1.0
+const N = KB.length;
+const df = {};
+for (const doc of KB) for (const t of new Set(doc.toks)) df[t] = (df[t] || 0) + 1;
+const IDF = {};
+for (const [t, c] of Object.entries(df)) IDF[t] = Math.log((N + 1) / (c + 0.5)) + 1.0;
+
+function findMatch(query) {
+  const qToks = tokenize(query);
+  if (!qToks.length) return null;
+
+  const qWeight = {};
+  for (const t of qToks) qWeight[t] = IDF[t] || 1.0;
+
+  const hits = [];
+  for (const doc of KB) {
+    let score = 0;
+    for (const [t, w] of Object.entries(qWeight)) {
+      const freq = doc.tf[t] || 0;
+      if (freq) score += (1 + Math.log(freq)) * w;
+    }
+    // Title bonus (+2.0 per matching query token in title)
+    for (const t of qToks) {
+      if (doc.titleToks.has(t)) score += 2.0 * (qWeight[t] || 0);
+    }
+    // Keyword bonus — explicit intent signal, strongly weighted
+    const kwHits = qToks.filter(t => doc.kw.has(t));
+    score += 6.0 * kwHits.length;
+
+    if (score > 0) hits.push({ doc, score });
+  }
+  hits.sort((a, b) => b.score - a.score);
+  if (!hits.length) return null;
+
+  const top = hits[0];
+  const qSet = new Set(qToks);
+  const titleOverlap = [...qSet].filter(t => top.doc.titleToks.has(t)).length;
+  const kwHit = qToks.some(t => top.doc.kw.has(t));
+
+  // Most distinctive query term that actually appears in this doc
+  const distincts = qToks.filter(t => top.doc.tf[t]).map(t => IDF[t] || 0);
+  const distinctive = distincts.length ? Math.max(...distincts) : 0;
+
+  // Confidence floor — mirrors KnowledgeBase.best() exactly
+  if (!kwHit && distinctive < 1.6 && titleOverlap === 0) return null;
+  if (!kwHit && top.score < 2.0) return null;
+
+  // Ambiguity guard: coin-toss between two docs → Get Help is safer
+  if (hits.length > 1) {
+    const runner = hits[1];
+    if (runner.score >= 0.85 * top.score && titleOverlap === 0) return null;
+  }
+
+  return top.doc;
+}
+
+// ── 3. ANSWER LAYER ──────────────────────────────────────────────────────
+//
+// getAnswer(question) is the single function the UI calls.
+// Return shape: { doc: KBDoc | null, source: 'kb' | 'noMatch' }
+//
+// ── LLM REPLACEMENT SEAM ─────────────────────────────────────────────────
+// To add an LLM backend: replace only this function. Keep the same return
+// shape. The retrieval layer (findMatch) and the UI never need to change.
+//
+// Example (endpoint that rephrases the guide text for the question):
+//
+//   const doc = findMatch(question);
+//   if (!doc) return { doc: null, source: 'noMatch' };
+//   const resp = await fetch('/api/guides/answer', {
+//     method: 'POST',
+//     headers: { 'Content-Type': 'application/json' },
+//     body: JSON.stringify({ guide: doc.body, question })
+//   });
+//   const { answer } = await resp.json();
+//   return { doc: { title: doc.title, body: answer }, source: 'llm' };
+//
+// ─────────────────────────────────────────────────────────────────────────
+async function getAnswer(question) {
+  const doc = findMatch(question);
+  if (!doc) return { doc: null, source: 'noMatch' };
+  return { doc, source: 'kb' };
+}
+
+// ── MARKDOWN RENDERER (minimal — handles the KB doc format) ──────────────
+function renderMd(md) {
+  const lines = md.split('\n');
+  let html = '', para = '', inOl = false, inUl = false;
+
+  function flushPara() {
+    if (para.trim()) { html += '<p>' + para.trim() + '</p>'; para = ''; }
+  }
+  function flushList() {
+    if (inOl) { html += '</ol>'; inOl = false; }
+    if (inUl) { html += '</ul>'; inUl = false; }
+  }
+
+  for (const line of lines) {
+    const s = line.trim();
+    if (!s || s.startsWith('#')) { flushPara(); flushList(); continue; }
+
+    const olM = s.match(/^(\d+)\.\s+(.+)/);
+    const ulM = s.match(/^[-*]\s+(.+)/);
+
+    if (olM) {
+      flushPara();
+      if (inUl) { html += '</ul>'; inUl = false; }
+      if (!inOl) { html += '<ol>'; inOl = true; }
+      html += '<li>' + olM[2] + '</li>';
+    } else if (ulM) {
+      flushPara();
+      if (inOl) { html += '</ol>'; inOl = false; }
+      if (!inUl) { html += '<ul>'; inUl = true; }
+      html += '<li>' + ulM[1] + '</li>';
+    } else {
+      flushList();
+      para += (para ? ' ' : '') + s;
+    }
+  }
+  flushPara(); flushList();
+  return html;
+}
+
+// ── UI ────────────────────────────────────────────────────────────────────
+const COMMON_TASKS = [
+  ['Install a program',   'How do I install software?'],
+  ['Update my computer',  'How do I run updates?'],
+  ['Connect a printer',   'How do I connect a printer?'],
+  ['Connect to Wi-Fi',    'How do I connect to Wi-Fi?'],
+  ['Find my files',       'Where are my files?'],
+  ['Get remote help',     'How do I get help from Michael?'],
+  ['Undo a problem',      'How do I restore with Timeshift?'],
+  ['Use a USB stick',     'How do I use a USB drive?'],
+];
+
+function initGuides() {
+  const btn     = document.getElementById('guidesBtn');
+  const panel   = document.getElementById('guidesPanel');
+  const input   = document.getElementById('gInput');
+  const submit  = document.getElementById('gSubmit');
+  const answer  = document.getElementById('gAnswer');
+  const tasks   = document.getElementById('gTasks');
+
+  // Build task pills
+  for (const [label, question] of COMMON_TASKS) {
+    const pill = document.createElement('button');
+    pill.className = 'g-task';
+    pill.textContent = label;
+    pill.addEventListener('click', () => {
+      input.value = question;
+      submitQuestion(question);
+    });
+    tasks.appendChild(pill);
+  }
+
+  // Toggle panel
+  btn.addEventListener('click', () => {
+    const open = btn.classList.toggle('open');
+    panel.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    if (open) setTimeout(() => input.focus(), 260);
+  });
+
+  // Close on outside click
+  document.addEventListener('click', e => {
+    if (!panel.contains(e.target) && !btn.contains(e.target)) {
+      btn.classList.remove('open');
+      panel.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Submit handlers
+  submit.addEventListener('click', () => submitQuestion(input.value));
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') submitQuestion(input.value); });
+
+  async function submitQuestion(q) {
+    q = q.trim();
+    if (!q) return;
+    answer.className = 'g-answer visible';
+    answer.innerHTML = '<p style="font-size:0.83rem;color:var(--ink-muted);padding:0.4rem 0">Looking it up…</p>';
+
+    const result = await getAnswer(q);
+
+    if (result.doc) {
+      answer.innerHTML =
+        '<div class="g-card"><h3>' + result.doc.title + '</h3>' +
+        renderMd(result.doc.body) + '</div>';
+    } else {
+      answer.innerHTML =
+        '<div class="g-escalation">' +
+        '<div class="g-esc-tag">Not sure about that one</div>' +
+        '<h3>Let Michael take it from here</h3>' +
+        '<p>That question is a little outside the quick-answer guides. ' +
+        'Send an email — describe what you\'re trying to do ' +
+        'and Michael will get back to you, usually the same day. ' +
+        'You\'re not raising a ticket; you\'re sending a message to a real person.</p>' +
+        '<a href="' + window.helpMailto() + '" class="g-help-link">Email Michael →</a>' +
+        '</div>';
+    }
+  }
+}
+
+// Exposed so the escalation link's onclick can close the panel before scrolling
+window.closeGuides = function () {
+  document.getElementById('guidesBtn').classList.remove('open');
+  document.getElementById('guidesPanel').classList.remove('open');
+  document.getElementById('guidesBtn').setAttribute('aria-expanded', 'false');
+};
+
+document.addEventListener('DOMContentLoaded', initGuides);
+
+})();
+  
+</script>
+</body>
+</html>
